@@ -1,0 +1,77 @@
+---
+title: "Principal Component Analysis"
+author: "Arthur/Rodolfo"
+date: "13-10-2015"
+output: html_document
+---
+
+
+```{r}
+require(FactoMineR)
+
+# The data refer to athletes’ performance during two athletics meetings.
+# The data set is made of 41 rows and 13 columns: the first ten columns corresponds to
+# the performance of the athletes for the 10 events of the decathlon. The columns 11 and 12
+# correspond respectively to the rank and the points obtained. The last column is a categorical
+# variable corresponding to the athletics meeting (2004 Olympic Game or 2004 Decastar). 
+data(decathlon)
+
+# running PCA 
+# The percentage of variability explained by each dimension
+res <- PCA(decathlon,
+           quanti.sup=11:12, # a vector indicating the indexes of the quantitative supplementary variables
+           quali.sup=13) # a vector indicating the indexes of the categorical supplementary variables
+
+
+# we can describe each principal component using the dimdesc function
+dimdesc(res)
+
+plot(res,invisible="quali")
+
+plot(res,choix="var")
+
+plot(res,choix="var", # the graph to plot ("ind" for the individuals, "var" for the variables)   
+     invisible="quanti.sup")
+
+plot(res, 
+     invisible="quali", 
+     habillage=13) # color the individuals among a categorical variable (give the number of the categorical  supplementary variable or its name)
+
+plot(res, select="contrib 7", invisible="quali") #plot the 7 individuals that have the highest cos2
+
+plot(res,select="cos2 0.8", invisible="quali") #plot the individuals that have a cos2 greater than 0.8
+plot(res,select="cos2 5", invisible="quali") #plot the 5 individuals that have the highest cos2
+plot(res,choix="var",select="cos2 0.6", invisible="quali") #plot the variables that have a cos2 greater than 0.6
+
+
+barplot(res$eig[,1], names.arg = paste("Dim", 1:nrow(res$eig), sep = ""))
+plot(res, choix = "var", axes = c(3, 4), lim.cos2.var = 0)
+
+
+
+
+aa=cbind.data.frame(decathlon[,13],res$ind$coord)
+
+bb=coord.ellipse( # Construct confidence ellipses (ellipsoid around a point which is an estimated solution to a problem)
+  aa,
+  bary=TRUE) # if bary = TRUE, the coordinates of the ellipse around the barycentre of individuals are calculated
+
+plot.PCA(res,habillage=13,ellipse=bb)
+
+res$eig
+x11()
+barplot(res$eig[,1],main="Eigenvalues",names.arg=1:nrow(res$eig))
+res$ind$coord
+res$ind$cos2
+res$ind$contrib
+
+dimdesc(res)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
